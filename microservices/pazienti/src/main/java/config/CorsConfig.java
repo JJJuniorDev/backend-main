@@ -1,0 +1,25 @@
+package config;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+//@Configuration
+public class CorsConfig {
+
+ /*   @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**") // Permetti richieste a tutti gli endpoint
+                        .allowedOrigins("http://localhost:4200",
+                        		"https://gestionale-dentista-frontend-etx4dp5x2.vercel.app",  // URL corretto
+                                "https://gestionale-dentista-frontend-etx4dp5x2.vercel.app/api") // Permetti richieste dal frontend
+                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Metodi permessi
+                        .allowedHeaders("*") // Permetti tutti gli headers
+                        .allowCredentials(true); // Se usi cookies o autenticazione con credenziali
+            }
+        };
+    }*/
+}
