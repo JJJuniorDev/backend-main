@@ -1,5 +1,7 @@
 package Model;
 
+import java.time.LocalDateTime;
+
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,8 +19,8 @@ public class EventoDelTrattamento {
 	    @Field(name = "DESCRIZIONE")
 	    private String descrizione;
 
-	    @Field(name = "DATA_SCADE")
-	    private String dataScade; // Data in cui la milestone deve essere raggiunta
+	    @Field(name = "DATA_E_ORARIO")
+	    private LocalDateTime dataEOrario; // Data in cui la milestone deve essere raggiunta
 
 	    @Field(name = "DELETED")
 	    private boolean deleted; // Stato della milestone
@@ -54,12 +56,14 @@ public class EventoDelTrattamento {
 			this.descrizione = descrizione;
 		}
 
-		public String getDataScade() {
-			return dataScade;
+
+
+		public LocalDateTime getDataEOrario() {
+			return dataEOrario;
 		}
 
-		public void setDataScade(String dataScade) {
-			this.dataScade = dataScade;
+		public void setDataEOrario(LocalDateTime dataEOrario) {
+			this.dataEOrario = dataEOrario;
 		}
 
 		public boolean isDeleted() {

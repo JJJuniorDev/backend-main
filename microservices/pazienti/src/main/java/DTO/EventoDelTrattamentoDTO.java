@@ -1,5 +1,7 @@
 package DTO;
 
+import java.time.LocalDateTime;
+
 import Helpers.IdHelper;
 import Model.EventoDelTrattamento;
 
@@ -7,14 +9,14 @@ public class EventoDelTrattamentoDTO {
 private String id;
 private String pianoTrattamentoId;
 private String descrizione;
-private String dataScade;
+private LocalDateTime dataEOrario;
 private boolean deleted;
 private String tipologia;
 private String dottoreId;
 
 public EventoDelTrattamentoDTO(EventoDelTrattamento a, IdHelper idHelper) {
 	this.descrizione= a.getDescrizione();
-	this.dataScade= a.getDataScade();
+	this.dataEOrario= a.getDataEOrario();
 	this.deleted=a.isDeleted();
 	this.tipologia=a.getTipologia();
 	this.id=idHelper.objectIdToString(a.getId());
@@ -44,11 +46,11 @@ public String getDescrizione() {
 public void setDescrizione(String descrizione) {
 	this.descrizione = descrizione;
 }
-public String getDataScade() {
-	return dataScade;
+public LocalDateTime getDataEOrario() {
+	return dataEOrario;
 }
-public void setDataScade(String dataScade) {
-	this.dataScade = dataScade;
+public void setDataEOrario(LocalDateTime dataEOrario) {
+	this.dataEOrario = dataEOrario;
 }
 public boolean isDeleted() {
 	return deleted;

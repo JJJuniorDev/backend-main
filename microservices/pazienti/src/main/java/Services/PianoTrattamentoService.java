@@ -188,7 +188,7 @@ public class PianoTrattamentoService {
 	    // Creare una nuova milestone dal DTO
 	    EventoDelTrattamento newEvento = new EventoDelTrattamento();
 	    newEvento.setDescrizione(eventoDTO.getDescrizione());
-	    newEvento.setDataScade(eventoDTO.getDataScade());
+	    newEvento.setDataEOrario(eventoDTO.getDataEOrario());
 	    newEvento.setDeleted(eventoDTO.isDeleted());
 	    newEvento.setPianoTrattamentoId(planIdObjectId);
         newEvento.setTipologia(eventoDTO.getTipologia());
@@ -260,7 +260,7 @@ String  appuntamentoId) {
         dto.setId(idHelper.objectIdToString(evento.getId()));
         dto.setPianoTrattamentoId(idHelper.objectIdToString(evento.getPianoTrattamentoId()));
         dto.setDescrizione(evento.getDescrizione());
-        dto.setDataScade(evento.getDataScade());
+        dto.setDataEOrario(evento.getDataEOrario());
         dto.setDeleted(evento.isDeleted());
         dto.setTipologia(evento.getTipologia());
         dto.setDottoreId(idHelper.objectIdToString(evento.getDottoreId()));

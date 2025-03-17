@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.slf4j.Logger;
@@ -43,7 +45,7 @@ public class EventoController {
 	        dto.setId(evento.getId().toHexString());
 	        dto.setPianoTrattamentoId(evento.getPianoTrattamentoId().toHexString());
 	        dto.setDescrizione(evento.getDescrizione());
-	        dto.setDataScade(evento.getDataScade());
+	        dto.setDataEOrario(evento.getDataEOrario());
 	        dto.setDeleted(evento.isDeleted());
 	        dto.setTipologia(evento.getTipologia());
 	        dto.setDottoreId(evento.getDottoreId().toHexString());
@@ -77,6 +79,30 @@ public class EventoController {
 	          }
 	    }
 	  
+	  
+	  @PutMapping("/update/{id}")
+	  @Transactional
+	  public ResponseEntity<Void> updateEvento(@PathVariable String id, @RequestBody EventoDelTrattamentoDTO eventoDto) {
+	      if (!ObjectId.isValid(id)) {
+	          return ResponseEntity.badRequest().build(); // Se l'ID non è valido, restituisce 400
+	      }
+
+	      Optional<EventoDelTrattamento> eventoOpt = eventoService.getEvento(id);
+	      if (eventoOpt.isEmpty()) {
+	          return ResponseEntity.notFound().build(); // Se l'evento non esiste, restituisce 404
+	      }
+
+	      EventoDelTrattamento evento = eventoOpt.get();
+	      
+	      // Aggiorniamo i campi
+	      evento.setDescrizione(eventoDto.getDescrizione());
+	      evento.setDataEOrario(eventoDto.getDataEOrario());
+	      evento.setTipologia(eventoDto.getTipologia());
+
+	      eventoService.salvaEvento(evento); // Salvataggio delle modifiche
+
+	      return ResponseEntity.ok().build(); // Restituisce 200 OK
+	  }
 	  
 	  
 
