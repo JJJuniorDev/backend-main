@@ -19,13 +19,16 @@ public class Nota {
    
 	 @Field("contenuto")
 	 private String contenuto; // Il testo della nota
+ 
+	 @Field("dottore_id")
+	 private ObjectId dottoreId; // L'utente che ha creato o modificato la nota
   
-	 @Field("farmaco_in_uso_id")
-	 private ObjectId farmacoInUsoId; // L'id del trattamento a cui la nota si riferisce
-  
-	 @Field("utente")
-	 private String utente; // L'utente che ha creato o modificato la nota
-  
+	 @Field("paziente_id")
+	 private ObjectId pazienteId;
+	 
+	 @Field("appuntamento_id")
+	 private ObjectId appuntamentoId;
+	 
 	 @Field("tipo_nota")
 	 private String tipoNota; // Tipo di nota, ad esempio "medica", "osservazione"
   
@@ -36,12 +39,13 @@ public class Nota {
 	 private boolean visibilita; // Visibilità della nota (ad esempio, solo per gli operatori)
 
     // Costruttore
-    public Nota(String contenuto, ObjectId farmacoInUsoId, String utente, String tipoNota) {
+    public Nota(String contenuto, ObjectId dottoreId, ObjectId pazienteId, ObjectId appuntamentoId, String tipoNota, String priorita) {
         this.dataCreazione = new Date(); // Imposta la data di creazione
         this.dataModifica = new Date(); // Imposta la data di modifica iniziale
         this.contenuto = contenuto;
-        this.farmacoInUsoId = farmacoInUsoId;
-        this.utente = utente;
+        this.pazienteId = pazienteId;
+        this.appuntamentoId = appuntamentoId;
+        this.dottoreId = dottoreId;
         this.tipoNota = tipoNota;
         this.priorita = "media"; // Impostazione di default della priorità
         this.visibilita = true; // Impostazione di default come visibile
@@ -83,20 +87,31 @@ public class Nota {
 		this.contenuto = contenuto;
 	}
 
-	public ObjectId getFarmacoInUsoId() {
-		return farmacoInUsoId;
+	
+	public ObjectId getDottoreId() {
+		return dottoreId;
 	}
 
-	public void setFarmacoInUsoId(ObjectId farmacoInUsoId) {
-		this.farmacoInUsoId = farmacoInUsoId;
+	public void setDottoreId(ObjectId dottoreId) {
+		this.dottoreId = dottoreId;
 	}
 
-	public String getUtente() {
-		return utente;
+	
+	
+	public ObjectId getPazienteId() {
+		return pazienteId;
 	}
 
-	public void setUtente(String utente) {
-		this.utente = utente;
+	public void setPazienteId(ObjectId pazienteId) {
+		this.pazienteId = pazienteId;
+	}
+
+	public ObjectId getAppuntamentoId() {
+		return appuntamentoId;
+	}
+
+	public void setAppuntamentoId(ObjectId appuntamentoId) {
+		this.appuntamentoId = appuntamentoId;
 	}
 
 	public String getTipoNota() {
