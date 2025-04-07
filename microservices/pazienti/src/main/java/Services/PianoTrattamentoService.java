@@ -84,7 +84,7 @@ public class PianoTrattamentoService {
 	    return convertToDTO(piano);
 	}
 	
-	public List<PianoTrattamentoDTO> getPianiTrattamentoByPazienteId(String pazienteId) {
+	public List<PianoTrattamentoDTO> getPianiTrattamentoByPazienteId(String pazienteId, String token) {
 	    ObjectId objectId = idHelper.stringToObjectId(pazienteId); // Converte String in ObjectId  
 
 	    // 1-> PRENDO TUTTI I PIANI
@@ -113,7 +113,7 @@ public class PianoTrattamentoService {
 	            // 1.3 GESTIONE APPUNTAMENTI
 	            if (piano.getAppuntamentiIds() != null && !piano.getAppuntamentiIds().isEmpty()) {
 	            	System.out.println("PRIMA DELLA FETCH n appuntamenti: "+ piano.getAppuntamentiIds().size());
-	                List<AppuntamentoDTOPaz> appuntamenti = fetchAppuntamentiFromMicroservice(piano.getAppuntamentiIds());
+	                List<AppuntamentoDTOPaz> appuntamenti = fetchAppuntamentiFromMicroservice(piano.getAppuntamentiIds(), token);
 	                System.out.println("Appuntamenti trovati per il piano: " + appuntamenti.size());
 	                dto.setAppuntamenti(appuntamenti);
 	            }
@@ -123,7 +123,7 @@ public class PianoTrattamentoService {
 	        .collect(Collectors.toList());
 	}
 	
-	private List<AppuntamentoDTOPaz> fetchAppuntamentiFromMicroservice(List<String> appuntamentiIds) {
+	private List<AppuntamentoDTOPaz> fetchAppuntamentiFromMicroservice(List<String> appuntamentiIds, String token) {
 	    String url = appuntamentoServiceUrl+"/api/appuntamenti/by-ids"; // Endpoint remoto del microservizio
 
 	    try {
@@ -143,6 +143,7 @@ public class PianoTrattamentoService {
 */
 	        headers.setContentType(MediaType.APPLICATION_JSON); // Cambia per JSON
 	        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON)); // Cambia per JSON
+	        headers.set("Authorization", token);
 	        HttpEntity<List<String>> requestEntity = new HttpEntity<>(appuntamentiIds, headers);
 	        
 	        // Usa RestTemplate di Spring Boot con supporto JSON

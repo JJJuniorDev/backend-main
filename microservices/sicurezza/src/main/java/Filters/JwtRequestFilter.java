@@ -39,56 +39,51 @@ import jakarta.servlet.http.HttpServletResponse;
 	    }
 
 	    @Override
-	    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-	        String authHeader = request.getHeader("Authorization");
-	        String token = null;
-	        String email = null;
+	    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws java.io.IOException, ServletException{
+	    	  String authHeader = request.getHeader("Authorization");
+	    	    String token = null;
+	    	    String email = null;
 
-	        // Skip JWT check for signup endpoint
-	        // Skip JWT check for login endpoint
-	        if (request.getRequestURI().equals("/api/signup") || request.getRequestURI().equals("/api/login")) {
-	            try {
-					filterChain.doFilter(request, response);
-				} catch (java.io.IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (ServletException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-	            return;
-	        }
+	    	    System.out.println("📌 Request URI: " + request.getRequestURI());
 
-	        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-	            token = authHeader.substring(7);
-	            //questo è l'username in realtà, devo creare un claim per la mail
-	            email = jwtUtil.extractEmail(token);
-	            
-	            System.out.println("email------------->"+email);
-	        }
+	    	    if (request.getRequestURI().equals("/api/signup") || request.getRequestURI().equals("/api/login")) {
+	    	        System.out.println("✅ Skip JWT check for: " + request.getRequestURI());
+	    	        filterChain.doFilter(request, response);
+	    	        return;
+	    	    }
+	    	    
+	    	    final String requestURI = request.getRequestURI();
+	    	    if (requestURI.startsWith("/videochiamate/")) {
+	    	    	filterChain.doFilter(request, response);
+	    	    	System.out.println("✅ Skip JWT check for: " + request.getRequestURI());
+	    	        return;
+	    	    }
 
-	        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-	            //UserDetails userDetails = userService.loadUserByUsername(username);
-	        	UserDetails userDetails = userService.loadUserByEmail(email);
+	    	    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+	    	        token = authHeader.substring(7);
+	    	        email = jwtUtil.extractEmail(token);
+	    	        System.out.println("📌 Token found: " + token);
+	    	        System.out.println("📌 Extracted Email: " + email);
+	    	    } else {
+	    	        System.out.println("❌ No valid token found!");
+	    	    }
 
-	            if (jwtUtil.validateToken(token, userDetails)) {
-	                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-	                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-	                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-	            }
+	    	    if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+	    	        UserDetails userDetails = userService.loadUserByEmail(email);
+	    	        System.out.println("📌 Loaded User: " + userDetails);
 
-	        }
+	    	        if (jwtUtil.validateToken(token, userDetails)) {
+	    	            System.out.println("✅ Token is valid!");
+	    	            UsernamePasswordAuthenticationToken authenticationToken =
+	    	                    new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+	    	            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+	    	            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+	    	        } else {
+	    	            System.out.println("❌ Invalid Token!");
+	    	        }
+	    	    }
 
-	        try {
-				filterChain.doFilter(request, response);
-			} catch (java.io.IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ServletException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-	    }
-	}
+	    	    filterChain.doFilter(request, response);
+	    	}
+}
 

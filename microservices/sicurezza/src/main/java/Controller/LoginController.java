@@ -48,13 +48,19 @@ public class LoginController {
     	 System.out.println("Login request received for email: " + loginRequest.getEmail());
     	try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
-        } catch (BadCredentialsException e) {
+            System.out.println("✅ Autenticazione riuscita per: " + loginRequest.getEmail());
+    	} catch (BadCredentialsException e) {
         	response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Incorrect email or password.");
-            return null;
+        	 System.out.println("❌ Autenticazione FALLITA: " + e.getMessage());
+        	return null;
         } catch (DisabledException disabledException) {
         	 response.sendError(HttpServletResponse.SC_NOT_FOUND, "Customer is not activated.");
-             return null;
+        	 System.out.println("❌ Autenticazione FALLITA: " + disabledException.getMessage());
+        	 return null;
         }
+    	catch (Exception e) {
+    		 System.out.println("❌ Autenticazione FALLITA: " + e.getMessage());
+    	}
         final ExtendedUserDetails userDetails =(ExtendedUserDetails) userMService.loadUserByEmail(loginRequest.getEmail());
         System.out.println("User details caricato: " + userDetails);
         final String jwt = jwtUtil.generateToken( userDetails.getId(), userDetails.getEmail(), userDetails.getRuolo());

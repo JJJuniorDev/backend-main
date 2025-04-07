@@ -1,6 +1,7 @@
 package Services;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -199,7 +200,7 @@ public class AppuntamentoService {
             .map(appuntamento -> {
             	   try {
                        if (newAppuntamento.getDataEOrario() != null) {
-                           appuntamento.setDataEOrario(newAppuntamento.getDataEOrario());
+                           appuntamento.setDataEOrario(newAppuntamento.getDataEOrario().toLocalDateTime());
                        }
                        if (newAppuntamento.getTrattamento() != null) {
                            appuntamento.setTrattamento(newAppuntamento.getTrattamento());
@@ -240,7 +241,11 @@ public class AppuntamentoService {
             public AppuntamentoDTO convertToDTO(Appuntamento appuntamento) {
                 AppuntamentoDTO dto = new AppuntamentoDTO();
                 dto.setId(appuntamento.getId().toString());
-                dto.setDataEOrario(appuntamento.getDataEOrario());
+                dto.setDataEOrario(
+            		    appuntamento.getDataEOrario()
+            		        .atZone(ZoneId.of("Europe/Rome"))
+            		        .toOffsetDateTime()
+            		);
                 dto.setTrattamento(appuntamento.getTrattamento());
                 dto.setNote(appuntamento.getNote());
                 return dto;
@@ -258,7 +263,11 @@ private AppuntamentoDTO convertToDto(Appuntamento appuntamento) {
     AppuntamentoDTO dto = new AppuntamentoDTO();
     // Esegui qui la mappatura dei campi
     dto.setId(idHelper.objectIdToString(appuntamento.getId()));
-    dto.setDataEOrario(appuntamento.getDataEOrario());
+    dto.setDataEOrario(
+		    appuntamento.getDataEOrario()
+		        .atZone(ZoneId.of("Europe/Rome"))
+		        .toOffsetDateTime()
+		);
    // dto.setPaziente(appuntamento.getPaziente());
     // Aggiungi altri campi rilevanti
 

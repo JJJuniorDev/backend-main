@@ -1,7 +1,8 @@
 package DTO;
 
 import java.time.LocalDateTime;
-
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class AppuntamentoDTO {
 		 private String id;
 	  
 	  @JsonProperty("dataEOrario")
-		    private LocalDateTime dataEOrario;
+		    private OffsetDateTime dataEOrario;
 	  
 	  @JsonProperty("trattamento")
 		    private String trattamento;
@@ -55,7 +56,9 @@ public class AppuntamentoDTO {
 		    	this.id=idHelper.objectIdToString(appuntamento.get().getId());
 		    	this.dottoreId=idHelper.objectIdToString(appuntamento.get().getDottoreId());
 		    	this.setCodiceFiscalePaziente(appuntamento.get().getCodiceFiscalePaziente());
-		    	this.dataEOrario=appuntamento.get().getDataEOrario();
+		    	  this.dataEOrario = appuntamento.get().getDataEOrario()
+		    		        .atZone(ZoneId.of("Europe/Rome"))
+		    		        .toOffsetDateTime();
 		    	this.trattamento=appuntamento.get().getTrattamento();
 		    	this.note=appuntamento.get().getNote();
 		    	 this.dottoreId = idHelper.objectIdToString(appuntamento.get().getDottoreId());
@@ -66,7 +69,9 @@ public class AppuntamentoDTO {
 		    public AppuntamentoDTO(Appuntamento appuntamento, PazienteDTO paziente, IdHelper idHelper) {
 		    	
 		        this.id = idHelper.objectIdToString(appuntamento.getId());
-		        this.dataEOrario = appuntamento.getDataEOrario();
+		        this.dataEOrario = appuntamento.getDataEOrario()
+		                .atZone(ZoneId.of("Europe/Rome"))
+		                .toOffsetDateTime();
 		        this.trattamento = appuntamento.getTrattamento();
 		        this.setCodiceFiscalePaziente(appuntamento.getCodiceFiscalePaziente());
 		        this.stato=appuntamento.getStato();
@@ -80,7 +85,9 @@ public class AppuntamentoDTO {
 		    	this.id=idHelper2.objectIdToString(a.getId());
 		    	//this.dentistaId=idHelper.objectIdToString(appuntamento.getDentistaId());
 		    	this.setCodiceFiscalePaziente(a.getCodiceFiscalePaziente());
-		    	this.dataEOrario=a.getDataEOrario();
+		    	  this.dataEOrario = a.getDataEOrario()
+		    		        .atZone(ZoneId.of("Europe/Rome"))
+		    		        .toOffsetDateTime();
 		    	this.trattamento=a.getTrattamento();
 		    	this.note=a.getNote();
 		    	 this.dottoreId = idHelper2.objectIdToString(a.getDottoreId());
@@ -93,10 +100,10 @@ public class AppuntamentoDTO {
 			public void setId(String id) {
 				this.id = id;
 			}
-			public LocalDateTime getDataEOrario() {
+			public OffsetDateTime  getDataEOrario() {
 				return dataEOrario;
 			}
-			public void setDataEOrario(LocalDateTime localDateTime) {
+			public void setDataEOrario(OffsetDateTime  localDateTime) {
 				this.dataEOrario = localDateTime;
 			}
 		

@@ -31,14 +31,18 @@ public class SimpleCorsFilter implements Filter {
       System.out.println("CORS FILTER CHIAMATO");
     	HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest request = (HttpServletRequest) req;
+        System.out.println("📌 CORS FILTER - Richiesta da: " + request.getHeader("Origin"));
+
       //  Map<String, String> map = new HashMap<>();
         String originHeader = request.getHeader("origin");
-        response.setHeader("Access-Control-Allow-Origin", originHeader);
+     //   response.setHeader("Access-Control-Allow-Origin", originHeader);
+        response.setHeader("Access-Control-Allow-Origin", "*"); // Test con *
         response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
         response.setHeader("Access-Control-Max-Age", "3600");
         response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
         response.setHeader("Access-Control-Allow-Credentials", "true");
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        	System.out.println("✅ CORS preflight request");
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         } 

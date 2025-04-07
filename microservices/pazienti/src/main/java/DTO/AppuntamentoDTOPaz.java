@@ -1,13 +1,14 @@
 package DTO;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
 public class AppuntamentoDTOPaz {
 private String id;
-private LocalDateTime dataEOrario;
+private OffsetDateTime dataEOrario;
 private String codiceFiscale;
 private String trattamento;
 private String note;
@@ -20,10 +21,10 @@ public String getId() {
 public void setId(String id) {
 	this.id = id;
 }
-public LocalDateTime getDataEOrario() {
+public OffsetDateTime getDataEOrario() {
 	return dataEOrario;
 }
-public void setDataEOrario(LocalDateTime dataEOrario) {
+public void setDataEOrario(OffsetDateTime dataEOrario) {
 	this.dataEOrario = dataEOrario;
 }
 public String getCodiceFiscale() {

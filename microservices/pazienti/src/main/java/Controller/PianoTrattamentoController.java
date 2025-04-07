@@ -13,6 +13,7 @@ import Model.EventoDelTrattamento;
 import Model.PianoTrattamento;
 import Services.EventoService;
 import Services.PianoTrattamentoService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,9 +44,11 @@ public class PianoTrattamentoController {
     }
 
     @GetMapping("/{pazienteId}/piani")
-    public List<PianoTrattamentoDTO> getPianiByPazienteId(@PathVariable String pazienteId) {
+    public List<PianoTrattamentoDTO> getPianiByPazienteId(@PathVariable String pazienteId,
+    		 HttpServletRequest request) {
+    	 String token = request.getHeader("Authorization"); // <-- Recupera il token
     	System.out.println("SIAMO NELLA GETPIANI");
-    	 return pianoTrattamentoService.getPianiTrattamentoByPazienteId(pazienteId);
+    	 return pianoTrattamentoService.getPianiTrattamentoByPazienteId(pazienteId, token);
     }
     
     @PostMapping("/{pazienteId}/piani/{planId}/appointments/addAppointment")

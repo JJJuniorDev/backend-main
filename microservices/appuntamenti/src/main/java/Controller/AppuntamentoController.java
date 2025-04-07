@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -61,6 +62,7 @@ import Model.Fattura;
 import Services.AppuntamentoService;
 import Services.EmailService;
 import Services.FileStorageService;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 @RestController
@@ -174,7 +176,11 @@ public class AppuntamentoController {
                dto.setDottoreId(idHelper.objectIdToString(appuntamento.getDottoreId()));
                dto.setPazienteId(idHelper.objectIdToString(appuntamento.getPazienteId())); // Converti l'ObjectId in stringa
                dto.setCodiceFiscalePaziente(appuntamento.getCodiceFiscalePaziente());
-               dto.setDataEOrario(appuntamento.getDataEOrario());
+               dto.setDataEOrario(
+            		    appuntamento.getDataEOrario()
+            		        .atZone(ZoneId.of("Europe/Rome"))
+            		        .toOffsetDateTime()
+            		);
                dto.setStato(appuntamento.getStato());
                dto.setNote(appuntamento.getNote());
                
@@ -196,9 +202,10 @@ public class AppuntamentoController {
  
     @Transactional
 @PostMapping
-public AppuntamentoDTO createAppuntamento(@RequestBody AppuntamentoDTO appuntamentoDTO) {
+public AppuntamentoDTO createAppuntamento(@RequestBody AppuntamentoDTO appuntamentoDTO,
+		 HttpServletRequest request) {
     Appuntamento appuntamento = new Appuntamento();
-    appuntamento.setDataEOrario(appuntamentoDTO.getDataEOrario());
+    appuntamento.setDataEOrario(appuntamentoDTO.getDataEOrario().toLocalDateTime());
     appuntamento.setTrattamento(appuntamentoDTO.getTrattamento());
     appuntamento.setNote(appuntamentoDTO.getNote());
     appuntamento.setStato(appuntamentoDTO.getStato());
@@ -213,21 +220,38 @@ public AppuntamentoDTO createAppuntamento(@RequestBody AppuntamentoDTO appuntame
     // Chiamata HTTP per aggiornare il paziente
     //AGGIORNO IL PAZIENTE MANDANDOGLI L'ID DELL'APPUNTAMENTO DA INSERIRE
     String pazienteServiceUrl = "http://localhost:8080/api/pazienti/" + pazienteId + "/aggiungi-appuntamento";
-    RestTemplate restTemplate = new RestTemplate();
-    //Map<String, String> request = new HashMap<>();
-    //restTemplate.put("appuntamentoId", appuntamentoId);
+    // ✅ Ottieni token dalla richiesta in entrata
+    String token = request.getHeader("Authorization");
+    
+    // ✅ Prepara headers con token e tipo contenuto
+    HttpHeaders headers = new HttpHeaders();
+    headers.set("Authorization", token); // ⚠️ Deve includere Bearer
+    headers.setContentType(MediaType.TEXT_PLAIN);
+
+    HttpEntity<String> entity = new HttpEntity<>(appuntamentoId, headers);
+
     try {
-        restTemplate.put(pazienteServiceUrl, appuntamentoId);  // Invia l'ID del nuovo appuntamento al microservizio Paziente
+        // ✅ Esegui la PUT con il token incluso
+        RestTemplate restTemplate = new RestTemplate();
+        restTemplate.exchange(
+            pazienteServiceUrl,
+            HttpMethod.PUT,
+            entity,
+            Void.class
+        );
     } catch (RestClientException e) {
-        // Gestisci l'errore se la chiamata HTTP fallisce
-    	 System.err.println("Errore nell'aggiornare il paziente: " + e.getMessage());
+        System.err.println("Errore nell'aggiornare il paziente: " + e.getMessage());
         throw new RuntimeException("Errore nell'aggiornare il paziente con il nuovo appuntamento", e);
     }
 
     // Converti l'Appuntamento in AppuntamentoDTO da restituire
     AppuntamentoDTO nuovoAppuntamentoDTO = new AppuntamentoDTO();
     nuovoAppuntamentoDTO.setId(appuntamentoId); // Converti l'ID in stringa
-    nuovoAppuntamentoDTO.setDataEOrario(nuovoAppuntamento.getDataEOrario());
+    nuovoAppuntamentoDTO.setDataEOrario(
+    	    appuntamento.getDataEOrario()
+    	        .atZone(ZoneId.of("Europe/Rome"))
+    	        .toOffsetDateTime()
+    	);
     nuovoAppuntamentoDTO.setTrattamento(nuovoAppuntamento.getTrattamento());
     nuovoAppuntamentoDTO.setNote(nuovoAppuntamento.getNote());
     nuovoAppuntamentoDTO.setStato(nuovoAppuntamento.getStato());

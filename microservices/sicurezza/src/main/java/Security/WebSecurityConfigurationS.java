@@ -38,14 +38,18 @@ import Repository.Sicurezza.UserMRepository;
 
 	    @Bean
 	    public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
-	        return security.csrf().disable()
+	    	System.out.println("📌 Configurazione Security inizializzata!");
+
+	    	return security.csrf().disable()
 	        		 .cors()
 		                .and()
 	                .authorizeHttpRequests()
-	                .requestMatchers("/signup", "/login").permitAll()
+	                .requestMatchers("/api/signup", "/api/login").permitAll()
+	                .requestMatchers("/videochiamate/**").permitAll()  // Accesso pubblico alle videochiamate
 	                .requestMatchers("/appuntamento/**").authenticated()
-	                .and()
-	                .authorizeHttpRequests().requestMatchers("/**").permitAll()
+	               .anyRequest().authenticated()  // 🔐 Tutto il resto è protetto
+	                //  .and()
+	                // .authorizeHttpRequests().requestMatchers("/**").permitAll()
 	               // .authenticated()
 	                .and()
 	                .sessionManagement()
