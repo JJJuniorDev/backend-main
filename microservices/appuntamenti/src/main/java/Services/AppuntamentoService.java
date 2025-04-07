@@ -3,6 +3,7 @@ package Services;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -64,27 +70,39 @@ public class AppuntamentoService {
     private static final Logger logger = LoggerFactory.getLogger(AppuntamentoService.class);
     
     // Chiamata API al microservizio Pazienti
-    public Optional<PazienteDTO> getPazienteById(String pazienteId) {
-    
-        try {
-            PazienteDTO paziente = restTemplate.getForObject(
-                pazientiServiceUrl + "/api/pazienti/" + pazienteId, PazienteDTO.class
-            );
-            return Optional.ofNullable(paziente);
-        } catch (HttpClientErrorException.NotFound e) {
-            logger.warn("Paziente non trovato: ID {}", pazienteId); // Log di livello WARN per 404
-            return Optional.empty();
-        } catch (HttpClientErrorException e) {
-            logger.error("Errore nella richiesta HTTP: " + e.getMessage(), e); // Log di livello ERROR per altre eccezioni HTTP
-            return Optional.empty();
-        } catch (RestClientException e) {
-            logger.error("Errore di connessione al servizio Pazienti: " + e.getMessage(), e); // Problemi di rete o connessione
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Errore generico nel recupero del paziente: " + e.getMessage(), e); // Log di livello ERROR per eccezioni generiche
-            return Optional.empty();
-        }
+    public Optional<PazienteDTO> getPazienteById(String pazienteId, String token) {
+    	try {
+    	 String url = pazientiServiceUrl + "/api/pazienti/" + pazienteId;
+
+         // Imposta headers con Authorization
+         HttpHeaders headers = new HttpHeaders();
+         headers.set("Authorization", token);
+         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+         HttpEntity<Void> requestEntity = new HttpEntity<>(headers);
+
+         ResponseEntity<PazienteDTO> response = restTemplate.exchange(
+             url,
+             HttpMethod.GET,
+             requestEntity,
+             PazienteDTO.class
+         );
+         return Optional.ofNullable(response.getBody());
+
+    } catch (HttpClientErrorException.NotFound e) {
+        logger.warn("Paziente non trovato: ID {}", pazienteId);
+        return Optional.empty();
+    } catch (HttpClientErrorException e) {
+        logger.error("Errore nella richiesta HTTP: " + e.getMessage(), e);
+        return Optional.empty();
+    } catch (RestClientException e) {
+        logger.error("Errore di connessione al servizio Pazienti: " + e.getMessage(), e);
+        return Optional.empty();
+    } catch (Exception e) {
+        logger.error("Errore generico nel recupero del paziente: " + e.getMessage(), e);
+        return Optional.empty();
     }
+}
     
     public List<AppuntamentoDTO> getAppuntamentiByIds(List<String> appuntamentiIds) {
     	  // Converte la lista di stringhe in una lista di ObjectId
@@ -98,11 +116,11 @@ public class AppuntamentoService {
     }
    
     // Metodo per recuperare l'appuntamento con i dettagli del paziente
-    public Optional<AppuntamentoDTO> getAppuntamentoConPaziente(String appuntamentoId) { //passo stringa appuntamento dal FE
+    public Optional<AppuntamentoDTO> getAppuntamentoConPaziente(String appuntamentoId, String token) { //passo stringa appuntamento dal FE
         Optional<Appuntamento> appuntamentoOpt = getAppuntamento(appuntamentoId); //becca appuntamento passandolo da stringa a objectId
         if (appuntamentoOpt.isPresent()) {
             Appuntamento appuntamento = appuntamentoOpt.get();
-            Optional<PazienteDTO> pazienteOpt = getPazienteById(idHelper.objectIdToString(appuntamento.getPazienteId()));
+            Optional<PazienteDTO> pazienteOpt = getPazienteById(idHelper.objectIdToString(appuntamento.getPazienteId()), token);
             
             if (pazienteOpt.isPresent()) {
                 AppuntamentoDTO appuntamentoDTO = new AppuntamentoDTO(appuntamento, pazienteOpt.get(), idHelper);
@@ -138,13 +156,13 @@ public class AppuntamentoService {
         return appuntamentoRepository.findByDottoreId(dottoreId);
     }
     
-    public List<AppuntamentoDTO> getAllAppuntamenti() {
+    public List<AppuntamentoDTO> getAllAppuntamenti(String token) {
         List<Appuntamento> appuntamenti = appuntamentoRepository.findAll();
         List<AppuntamentoDTO> appuntamentiDTO = new ArrayList<>();
         logger.info("Numero di appuntamenti trovati: " + appuntamenti.size()); 
         for (Appuntamento appuntamento : appuntamenti) {
         	String idPaziente=idHelper.objectIdToString(appuntamento.getPazienteId()); 
-            Optional<PazienteDTO> pazienteOpt = getPazienteById(idPaziente);
+            Optional<PazienteDTO> pazienteOpt = getPazienteById(idPaziente, token);
             
          try {
                 AppuntamentoDTO appuntamentoDTO = new AppuntamentoDTO(appuntamento, pazienteOpt.get(), idHelper);

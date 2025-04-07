@@ -138,13 +138,16 @@ public class AppuntamentoController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<AppuntamentoDTO> getAppuntamentoConPaziente(@PathVariable("id") String id) {
+    public ResponseEntity<AppuntamentoDTO> getAppuntamentoConPaziente(@PathVariable("id") String id,
+    		HttpServletRequest request) {
+
+        String token = request.getHeader("Authorization"); //  prendi il token
         if (!ObjectId.isValid(id)) {
             logger.warn("ID non valido: {}", id);  // Log WARN per un ID non valido
             return ResponseEntity.badRequest().build();
         }
         try {
-            Optional<AppuntamentoDTO> appuntamentoDTOOpt = appuntamentoService.getAppuntamentoConPaziente(id);
+            Optional<AppuntamentoDTO> appuntamentoDTOOpt = appuntamentoService.getAppuntamentoConPaziente(id, token);
             return appuntamentoDTOOpt
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> {
@@ -158,9 +161,10 @@ public class AppuntamentoController {
     }
 
     @GetMapping
-    public List<AppuntamentoDTO> getAllAppuntamenti() {
+    public List<AppuntamentoDTO> getAllAppuntamenti(HttpServletRequest request) {
        logger.info("IN getAllAppuntamenti");
-        return appuntamentoService.getAllAppuntamenti();
+       String token = request.getHeader("Authorization"); // <-- Recuperi il token
+        return appuntamentoService.getAllAppuntamenti(token);
     }
     
     @GetMapping("/dottore/{dottoreId}")
