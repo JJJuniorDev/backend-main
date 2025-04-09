@@ -78,7 +78,8 @@ import Repository.Sicurezza.UserMRepository;
 	                        .allowedOrigins("https://gestionale-dentista-frontend-etx4dp5x2.vercel.app",  // URL corretto
 	                                "https://gestionale-dentista-frontend-etx4dp5x2.vercel.app/api",
 	                                "https://gestionale-dentista-frontend-kk9969xsx.vercel.app",
-	                                "https://gestionale-dentista-frontend-kk9969xsx.vercel.app/api"
+	                                "https://gestionale-dentista-frontend-kk9969xsx.vercel.app/api",
+	                                "http://localhost:4200"
 	                              //  "https://gestionale-dentista-frontend-7nxhklfpb.vercel.app",
 	                              //  "https://gestionale-dentista-frontend-7nxhklfpb.vercel.app/api"
 	                                )

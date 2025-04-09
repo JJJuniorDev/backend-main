@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -183,6 +184,17 @@ public class NotaController {
 
 	        return ResponseEntity.ok(archiviateDTO);
 	    }
+	    
+	    @DeleteMapping("/delete/{id}")
+	    public ResponseEntity<?> deleteNota(@PathVariable String id) {
+	    	 ObjectId objectId = idHelper.stringToObjectId(id);
+	    	    if (notaRepository.existsById(objectId)) {
+	    	        notaRepository.deleteById(objectId);
+	    	        return ResponseEntity.ok().body(Map.of("message", "Nota eliminata con successo."));
+	    	    } else {
+	    	        return ResponseEntity.status(404).body(Map.of("error", "Nota non trovata."));
+	    	    }    	
+	}
 	  
 	  
 	  private NotaDTO convertToDTO(Nota nota) {

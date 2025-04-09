@@ -280,13 +280,14 @@ public ResponseEntity<Appuntamento> updateAppuntamento(@PathVariable String id, 
 
 @DeleteMapping("/{id}")
 @Transactional  // Assicura che tutte le operazioni siano gestite come una singola transazione
-public ResponseEntity<Void> deleteAppuntamento(@PathVariable String id) {
+public ResponseEntity<Void> deleteAppuntamento(@PathVariable String id, HttpServletRequest request) {
     // Controlla se l'ID è valido prima di procedere
     if (!ObjectId.isValid(id)) {
         return ResponseEntity.badRequest().build();  // Restituisce un 400 se l'ID non è valido
     }
 
     try {
+    	 String token = request.getHeader("Authorization");
         // Ottieni l'appuntamento e il paziente associato
       Optional<Appuntamento> appuntamentoOpt = appuntamentoService.getAppuntamento(id);
         //if (appuntamentoOpt.isEmpty()) {
@@ -300,8 +301,18 @@ public ResponseEntity<Void> deleteAppuntamento(@PathVariable String id) {
         	System.out.println("APP ELIMINATO");
         	try {
         		String pazienteServiceUrl="http://localhost:8080/api/pazienti/"+pazienteId + "/rimuovi-appuntamento";
-        		  restTemplateR.put(pazienteServiceUrl, id); // Passa l'ID dell'appuntamento da rimuovere
-        	}
+        		
+        		    // Se il token è presente, esegui la richiesta con il token
+                 if (token != null && !token.isEmpty()) {
+                     // Prepara gli header per la richiesta PUT
+                     HttpHeaders headers = new HttpHeaders();
+                     headers.set("Authorization", token);  // Aggiungi il token alla richiesta
+                     headers.setContentType(MediaType.TEXT_PLAIN);
+
+                     HttpEntity<String> entity = new HttpEntity<>(id, headers);
+                     restTemplateR.exchange(pazienteServiceUrl, HttpMethod.PUT, entity, Void.class);
+                 }
+                 }
         	catch (Exception e) {
                 // Gestisci errori di connessione o fallimenti del microservizio Paziente
                 return ResponseEntity.status(500).body(null);

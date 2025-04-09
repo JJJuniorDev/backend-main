@@ -14,6 +14,7 @@ import Services.AllegatoService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/allegati")
@@ -56,4 +57,15 @@ public class AllegatoController {
                         .body(allegato.getContenuto()))
                 .orElse(ResponseEntity.notFound().build());
     }
+    
+    @DeleteMapping("/delete/{fileId}")
+    public ResponseEntity<?> deleteAllegato(@PathVariable String fileId) {
+        boolean deleted = allegatoService.eliminaAllegato(fileId);
+        if (deleted) {
+        	  return ResponseEntity.ok().body(Map.of("message", "File eliminato con successo"));
+        } else {
+        	  return ResponseEntity.status(404).body(Map.of("error", "Allegato non trovato"));
+        }   
+}
+    
 }

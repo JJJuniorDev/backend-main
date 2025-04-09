@@ -1,5 +1,6 @@
 package Services;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,6 +59,14 @@ public class AllegatoService {
     public Optional<AllegatoDTO> getAllegato(String id) {
         return allegatoRepository.findById(idHelper.stringToObjectId(id))
                 .map(this::convertToDTO);
+    }
+    
+    public boolean eliminaAllegato(String id) {
+        ObjectId objectId = idHelper.stringToObjectId(id);
+        return allegatoRepository.findById(objectId).map(allegato -> {
+            allegatoRepository.delete(allegato);
+            return true;
+        }).orElse(false);
     }
     
     // Metodo di conversione da Allegato a AllegatoDTO
